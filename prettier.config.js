@@ -9,6 +9,6 @@ const config = {
 	bracketSpacing: true,
 	plugins: ['prettier-plugin-svelte'],
 	overrides: [{ files: '*.svelte', options: { parser: 'svelte' } }]
-};
+}
 
-export default config;
+export default config
