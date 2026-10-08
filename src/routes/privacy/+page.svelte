@@ -44,8 +44,10 @@
 
 		<h2>Retention</h2>
 		<p>
-			Promptium stores nothing: no server-side logs of your idea, no history, no profiles.
-			Anything retained upstream is governed by the provider's own policy (linked above).
+			Promptium has no database, no history, and no profiles — your idea is never written to
+			disk. A short-lived rate-limit counter keyed by IP address exists in server memory only
+			and expires within about a minute. Anything retained upstream is governed by the
+			provider's own policy (linked above).
 		</p>
 
 		<h2>Cookies and local storage</h2>
@@ -57,12 +59,13 @@
 
 		<h2>Your choices and rights</h2>
 		<p>
-			Depending on where you live (for example under the GDPR in the EEA or UK, or CCPA/CPRA
-			in California), you may have rights to access, correct, delete, or obtain a copy of your
-			data, and to object to or restrict certain processing. Because Promptium does not store
-			submissions, most such requests would concern data held in your own browser or, where
-			applicable, upstream providers. To make a request, contact us at
-			<span class="todo">[TODO — add a data-request contact address before launch]</span>.
+			Because Promptium keeps no record of your submissions, there is nothing held here to
+			access, correct, or delete. Depending on where you live (for example under the GDPR in
+			the EEA or UK, or CCPA/CPRA in California), you may have rights over data the AI
+			provider retains — exercise those with the provider, as described in
+			<a href="https://openrouter.ai/privacy" target="_blank" rel="noopener noreferrer"
+				>OpenRouter's privacy policy</a
+			>. Anything on your own device is under your control and clearable through your browser.
 		</p>
 
 		<h2>Changes</h2>

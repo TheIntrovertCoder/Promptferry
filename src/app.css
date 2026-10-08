@@ -286,16 +286,6 @@ main {
 	font-size: 1.0625rem;
 }
 
-.legal .todo {
-	display: inline-block;
-	padding: 1px 8px;
-	font-weight: 600;
-	color: var(--danger);
-	background-color: var(--danger-surface);
-	border: 1px dashed var(--danger-border);
-	border-radius: 6px;
-}
-
 /* ---------------------------------------------------------------
    Hero
    --------------------------------------------------------------- */

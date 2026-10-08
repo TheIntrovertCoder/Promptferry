@@ -63,7 +63,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 
 	const injection = scanForInjection(idea)
 	if (injection) {
-		console.warn(`[guard] injection blocked ip=${address} pattern=${injection}`)
+		console.warn(`[guard] injection blocked pattern=${injection}`)
 		return plain(
 			'This was flagged as a prompt-injection attempt and blocked. Describe your project idea instead.',
 			400
