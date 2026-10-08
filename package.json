@@ -35,5 +35,10 @@
 	"imports": {
 		"#lib": "./src/lib/index.js",
 		"#lib/*": "./src/lib/*"
+	},
+	"dependencies": {
+		"@openrouter/sdk": "^1.4.25",
+		"dompurify": "^3.4.16",
+		"marked": "^18.1.0"
 	}
 }
