@@ -2,6 +2,7 @@
 	import { marked } from 'marked'
 	import DOMPurify from 'dompurify'
 	import { browser } from '$app/env'
+	import { IDEA_MAX_LENGTH, sanitizeIdea } from '#lib/idea.ts'
 
 	let input = $state('')
 	let raw = $state('')
@@ -21,17 +22,30 @@
 		event.preventDefault()
 		if (loading) return
 
-		loading = true
 		error = ''
+		const idea = sanitizeIdea(input)
+		if (!idea) {
+			error = 'Please enter a project idea.'
+			return
+		}
+
+		loading = true
 		copied = false
 		raw = ''
 
 		try {
 			const formData = new FormData()
-			formData.append('great-idea', input)
+			formData.append('great-idea', idea)
 
 			const res = await fetch('/', { method: 'POST', body: formData })
-			if (!res.ok || !res.body) throw new Error(`request failed (${res.status})`)
+			if (!res.ok) {
+				const detail = res.status < 500 ? (await res.text()).trim() : ''
+				error =
+					detail.slice(0, 300) ||
+					'Something went wrong while crafting your prompt. Please try again.'
+				return
+			}
+			if (!res.body) throw new Error('no response body')
 
 			const reader = res.body.getReader()
 			const decoder = new TextDecoder()
@@ -86,6 +100,7 @@
 		bind:value={input}
 		placeholder="e.g. A habit-tracking app with streaks, reminders, and a weekly progress report…"
 		rows="5"
+		maxlength={IDEA_MAX_LENGTH}
 		required
 		autocomplete="off"
 		autocapitalize="sentences"></textarea>

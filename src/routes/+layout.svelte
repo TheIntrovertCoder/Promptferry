@@ -55,3 +55,16 @@
 <main>
 	{@render children()}
 </main>
+
+<footer class="site-footer">
+	<p>
+		Ideas are processed by <a
+			href="https://openrouter.ai"
+			target="_blank"
+			rel="noopener noreferrer">OpenRouter</a
+		>
+		to generate your prompt. No accounts, no tracking. Generated prompts are provided as-is — review
+		and adapt before use.
+	</p>
+	<a class="footer-link" href="/privacy">Privacy</a>
+</footer>
