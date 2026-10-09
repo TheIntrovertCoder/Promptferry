@@ -8,7 +8,21 @@
 	let raw = $state('')
 	let loading = $state(false)
 	let error = $state('')
+	let hint = $state('')
 	let copied = $state(false)
+
+	const NON_IDEA_FALLBACK =
+		'That looks like a request for content rather than a project to build. Describe the app, site, or tool you want to make.'
+
+	function errorFallback(status: number): string {
+		if (status === 429)
+			return 'You are sending requests too quickly. Wait a moment and try again.'
+		if (status === 413)
+			return 'Your idea was too large to process. Please shorten it and try again.'
+		if (status >= 500)
+			return 'The prompt service had a problem on its side. Please try again in a moment.'
+		return 'The server rejected this request. Please check your idea and try again.'
+	}
 
 	let copyTimer: ReturnType<typeof setTimeout> | undefined
 
@@ -23,6 +37,7 @@
 		if (loading) return
 
 		error = ''
+		hint = ''
 		const idea = sanitizeIdea(input)
 		if (!idea) {
 			error = 'Please enter a project idea.'
@@ -37,26 +52,41 @@
 			const formData = new FormData()
 			formData.append('great-idea', idea)
 
-			const res = await fetch('/', { method: 'POST', body: formData })
-			if (!res.ok) {
-				const detail = res.status < 500 ? (await res.text()).trim() : ''
-				error =
-					detail.slice(0, 300) ||
-					'Something went wrong while crafting your prompt. Please try again.'
+			let res: Response
+			try {
+				res = await fetch('/', { method: 'POST', body: formData })
+			} catch {
+				error = 'Could not reach the server. Check your internet connection and try again.'
 				return
 			}
-			if (!res.body) throw new Error('no response body')
+
+			if (!res.ok) {
+				const detail = (await res.text().catch(() => '')).trim().slice(0, 300)
+				if (res.status === 422) {
+					hint = detail || NON_IDEA_FALLBACK
+				} else {
+					error = detail || errorFallback(res.status)
+				}
+				return
+			}
+
+			if (!res.body) {
+				error = 'The server returned an empty response. Please try again.'
+				return
+			}
 
 			const reader = res.body.getReader()
 			const decoder = new TextDecoder()
-			while (true) {
-				const { done, value } = await reader.read()
-				if (done) break
-				raw += decoder.decode(value, { stream: true })
+			try {
+				while (true) {
+					const { done, value } = await reader.read()
+					if (done) break
+					raw += decoder.decode(value, { stream: true })
+				}
+				raw += decoder.decode()
+			} catch {
+				error = 'The connection dropped while generating your prompt. Please try again.'
 			}
-			raw += decoder.decode()
-		} catch {
-			error = 'Something went wrong while crafting your prompt. Please try again.'
 		} finally {
 			loading = false
 		}
@@ -118,6 +148,10 @@
 
 {#if error}
 	<p class="error" role="alert">{error}</p>
+{/if}
+
+{#if hint}
+	<p class="hint" role="status">{hint}</p>
 {/if}
 
 {#if loading || raw}

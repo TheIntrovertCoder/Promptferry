@@ -24,6 +24,9 @@
 	--danger: #d70015;
 	--danger-surface: rgba(215, 0, 21, 0.07);
 	--danger-border: rgba(215, 0, 21, 0.28);
+	--hint: #8a5a00;
+	--hint-surface: rgba(138, 90, 0, 0.08);
+	--hint-border: rgba(138, 90, 0, 0.3);
 	--shadow-card: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 32px rgba(0, 0, 0, 0.07);
 
 	/* Radii */
@@ -75,6 +78,9 @@
 	--danger: #ff453a;
 	--danger-surface: rgba(255, 69, 58, 0.12);
 	--danger-border: rgba(255, 69, 58, 0.35);
+	--hint: #ffd60a;
+	--hint-surface: rgba(255, 214, 10, 0.12);
+	--hint-border: rgba(255, 214, 10, 0.32);
 	--shadow-card: 0 1px 2px rgba(0, 0, 0, 0.5), 0 12px 32px rgba(0, 0, 0, 0.45);
 }
 
@@ -432,6 +438,17 @@ main {
 	color: var(--danger);
 	background-color: var(--danger-surface);
 	border: 1px solid var(--danger-border);
+	border-radius: var(--radius-md);
+}
+
+.hint {
+	margin-top: var(--space-4);
+	padding: 12px 16px;
+	font-size: 0.9375rem;
+	line-height: 1.45;
+	color: var(--hint);
+	background-color: var(--hint-surface);
+	border: 1px solid var(--hint-border);
 	border-radius: var(--radius-md);
 }
 

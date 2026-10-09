@@ -49,3 +49,26 @@ export function scanForInjection(input: string): string | null {
 	}
 	return null
 }
+
+const PROJECT_NOUNS =
+	/\b(?:app|application|website|site|web\s*app|platform|tool|service|saas|software|program|system|dashboard|game|bot|extension|api|marketplace|tracker|planner|manager|generator|maker|builder)\b/i
+
+const NON_IDEA_PATTERNS: InjectionPattern[] = [
+	{
+		label: 'content-request',
+		pattern:
+			/^\s*(?:(?:please|pls|can\s+you|could\s+you)\s+)*(?:generate|draw|paint|imagine|write|compose|translate|summari[sz]e|explain|solve|calculate|tell|give|list|find|recommend|show)\b/i
+	},
+	{
+		label: 'question',
+		pattern: /^\s*(?:what|who|when|where|why|which|how|is|are|can|could|should|do|does|did)\b/i
+	}
+]
+
+export function scanForNonIdea(input: string): string | null {
+	if (PROJECT_NOUNS.test(input)) return null
+	for (const { label, pattern } of NON_IDEA_PATTERNS) {
+		if (pattern.test(input)) return label
+	}
+	return null
+}
