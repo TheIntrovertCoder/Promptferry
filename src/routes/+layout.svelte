@@ -14,7 +14,7 @@
 <header class="site-header">
 	<a class="brand" href="/">
 		<img class="brand-mark" src={favicon} alt="" width="28" height="28" />
-		<span>Promptium</span>
+		<span>Promptferry</span>
 	</a>
 
 	<button

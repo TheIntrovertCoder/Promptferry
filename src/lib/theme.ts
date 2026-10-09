@@ -2,7 +2,7 @@ import { browser } from '$app/env'
 
 export type Theme = 'light' | 'dark'
 
-const STORAGE_KEY = 'promptium-theme'
+const STORAGE_KEY = 'promptferry-theme'
 
 export function toggleTheme(): void {
 	if (!browser) return

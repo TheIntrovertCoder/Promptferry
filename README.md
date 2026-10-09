@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-bun x sv@1.1.1 create --template minimal --types ts --add prettier eslint enhanced-img sveltekit-adapter="adapter:auto" --install bun promptium
+bun x sv@1.1.1 create --template minimal --types ts --add prettier eslint enhanced-img sveltekit-adapter="adapter:auto" --install bun promptferry
 ```
 
 ## Adding features

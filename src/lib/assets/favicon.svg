@@ -1,18 +1,33 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
-	<rect width="64" height="64" rx="15" fill="url(#promptium-gradient)" />
+	<rect width="64" height="64" rx="15" fill="url(#promptferry-gradient)" />
 	<path
-		d="M32 9 C33.2 22.8 41.2 30.8 55 32 C41.2 33.2 33.2 41.2 32 55 C30.8 41.2 22.8 33.2 9 32 C22.8 30.8 30.8 22.8 32 9 Z"
-		fill="#ffffff"
+		d="M23 18 L41 32 L23 46"
+		fill="none"
+		stroke="#ffffff"
+		stroke-width="7"
+		stroke-linecap="round"
+		stroke-linejoin="round"
 	/>
 	<path
-		d="M48.5 11.5 C49 15.4 50.6 17 54.5 17.5 C50.6 18 49 19.6 48.5 23.5 C48 19.6 46.4 18 42.5 17.5 C46.4 17 48 15.4 48.5 11.5 Z"
-		fill="#ffffff"
-		fill-opacity="0.9"
+		d="M15 52 C19 47.5 23 47.5 27 52 C31 56.5 35 56.5 39 52 C43 47.5 47 47.5 51 52"
+		fill="none"
+		stroke="#ffffff"
+		stroke-width="5"
+		stroke-linecap="round"
+		stroke-linejoin="round"
+		opacity="0.92"
 	/>
 	<defs>
-		<linearGradient id="promptium-gradient" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-			<stop stop-color="#0071e3" />
-			<stop offset="1" stop-color="#5e5ce6" />
+		<linearGradient
+			id="promptferry-gradient"
+			x1="0"
+			y1="0"
+			x2="64"
+			y2="64"
+			gradientUnits="userSpaceOnUse"
+		>
+			<stop stop-color="#0aa2c0" />
+			<stop offset="1" stop-color="#0071e3" />
 		</linearGradient>
 	</defs>
 </svg>

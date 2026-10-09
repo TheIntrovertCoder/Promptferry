@@ -77,17 +77,17 @@
 </script>
 
 <svelte:head>
-	<title>Promptium — Your idea, the ultimate prompt</title>
+	<title>Promptferry — Your idea, the ultimate prompt</title>
 	<meta
 		name="description"
-		content="Describe your project idea and Promptium turns it into the ultimate, ready-to-use prompt."
+		content="Describe your project idea and Promptferry turns it into the ultimate, ready-to-use prompt."
 	/>
 </svelte:head>
 
 <section class="hero">
 	<h1>Describe your project.<br />Get the <span class="grad">ultimate prompt</span>.</h1>
 	<p class="sub">
-		Share your idea. Promptium turns it into a precise, production-ready prompt you can use
+		Share your idea. Promptferry turns it into a precise, production-ready prompt you can use
 		anywhere.
 	</p>
 </section>

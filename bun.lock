@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "promptium",
+      "name": "promptferry",
       "dependencies": {
         "@openrouter/sdk": "^1.4.25",
         "dompurify": "^3.4.16",

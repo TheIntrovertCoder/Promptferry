@@ -3,25 +3,25 @@
 </script>
 
 <svelte:head>
-	<title>Privacy — Promptium</title>
+	<title>Privacy — Promptferry</title>
 	<meta
 		name="description"
-		content="What Promptium processes, who processes it, how long it is kept, and your choices."
+		content="What Promptferry processes, who processes it, how long it is kept, and your choices."
 	/>
 </svelte:head>
 
 <section class="legal">
 	<h1>Privacy</h1>
 	<p class="legal-note">
-		Plain-language draft of Promptium's data practices — not legal advice, and not a compliance
-		certification. Have counsel review before launch.
+		Plain-language draft of Promptferry's data practices — not legal advice, and not a
+		compliance certification. Have counsel review before launch.
 	</p>
 
 	<div class="prose">
 		<h2>What is processed</h2>
 		<p>
-			The project idea you type into the form (up to {IDEA_MAX_LENGTH} characters). Promptium has
-			no accounts, no analytics, no advertising, and no cookies.
+			The project idea you type into the form (up to {IDEA_MAX_LENGTH} characters). Promptferry
+			has no accounts, no analytics, no advertising, and no cookies.
 		</p>
 
 		<h2>Why it is processed</h2>
@@ -34,7 +34,7 @@
 				target="_blank"
 				rel="noopener noreferrer">openrouter.ai</a
 			>), which runs the AI model that writes the prompt. The request is made only when you
-			submit the form. Promptium itself keeps no database and no record of your submission —
+			submit the form. Promptferry itself keeps no database and no record of your submission —
 			the request is streamed through and discarded. How OpenRouter handles data in turn is
 			described in
 			<a href="https://openrouter.ai/privacy" target="_blank" rel="noopener noreferrer"
@@ -44,7 +44,7 @@
 
 		<h2>Retention</h2>
 		<p>
-			Promptium has no database, no history, and no profiles — your idea is never written to
+			Promptferry has no database, no history, and no profiles — your idea is never written to
 			disk. A short-lived rate-limit counter keyed by IP address exists in server memory only
 			and expires within about a minute. Anything retained upstream is governed by the
 			provider's own policy (linked above).
@@ -53,13 +53,13 @@
 		<h2>Cookies and local storage</h2>
 		<p>
 			No cookies are set. One preference is saved in your browser's local storage — your
-			light/dark theme choice (<code>promptium-theme</code>). It never leaves your device and
-			you can clear it at any time through your browser's site-data settings.
+			light/dark theme choice (<code>promptferry-theme</code>). It never leaves your device
+			and you can clear it at any time through your browser's site-data settings.
 		</p>
 
 		<h2>Your choices and rights</h2>
 		<p>
-			Because Promptium keeps no record of your submissions, there is nothing held here to
+			Because Promptferry keeps no record of your submissions, there is nothing held here to
 			access, correct, or delete. Depending on where you live (for example under the GDPR in
 			the EEA or UK, or CCPA/CPRA in California), you may have rights over data the AI
 			provider retains — exercise those with the provider, as described in
