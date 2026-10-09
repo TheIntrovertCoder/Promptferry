@@ -2,7 +2,19 @@
 	"name": "promptferry",
 	"private": true,
 	"version": "0.0.1",
+	"description": "Turn a project idea into the ultimate, production-ready build prompt.",
+	"license": "MIT",
+	"author": "TheIntrovertCoder",
 	"type": "module",
+	"packageManager": "bun@1.4.3",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TheIntrovertCoder/Promptferry.git"
+	},
+	"homepage": "https://github.com/TheIntrovertCoder/Promptferry#readme",
+	"bugs": {
+		"url": "https://github.com/TheIntrovertCoder/Promptferry/issues"
+	},
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -15,7 +27,7 @@
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",
-		"@sveltejs/adapter-auto": "^8.0.0",
+		"@sveltejs/adapter-netlify": "^7.0.0",
 		"@sveltejs/enhanced-img": "^1.0.0",
 		"@sveltejs/kit": "^3.0.0",
 		"@sveltejs/vite-plugin-svelte": "^7.2.0",
@@ -37,6 +49,7 @@
 		"#lib/*": "./src/lib/*"
 	},
 	"dependencies": {
+		"@netlify/blobs": "^11.1.4",
 		"@openrouter/sdk": "^1.4.25",
 		"dompurify": "^3.4.16",
 		"marked": "^18.1.0"

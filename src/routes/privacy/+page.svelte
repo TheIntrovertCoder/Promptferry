@@ -44,10 +44,11 @@
 
 		<h2>Retention</h2>
 		<p>
-			Promptferry has no database, no history, and no profiles — your idea is never written to
-			disk. A short-lived rate-limit counter keyed by IP address exists in server memory only
-			and expires within about a minute. Anything retained upstream is governed by the
-			provider's own policy (linked above).
+			Promptferry has no history and no profiles — your idea is never stored. A short-lived
+			rate-limit counter keyed by IP address is kept for about a minute and then expires: in
+			server memory when running locally, or in Netlify Blobs (a key-value store) when
+			deployed on Netlify. Anything retained upstream is governed by the provider's own policy
+			(linked above).
 		</p>
 
 		<h2>Cookies and local storage</h2>

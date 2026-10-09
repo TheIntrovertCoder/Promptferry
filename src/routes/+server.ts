@@ -59,7 +59,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		address = 'unknown'
 	}
 
-	const rate = checkRateLimit(address)
+	const rate = await checkRateLimit(address)
 	if (!rate.ok) {
 		return plain(`Too many requests — wait ${rate.retryAfterSeconds}s and try again.`, 429, {
 			'Retry-After': String(rate.retryAfterSeconds)
