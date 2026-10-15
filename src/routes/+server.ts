@@ -122,7 +122,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 	try {
 		prompt_response = await openrouter_client.chat.send({
 			chatRequest: {
-				model: 'openrouter/auto',
+				model: 'openrouter/free',
 				messages: [
 					{ role: 'system', content: SYSTEM_MESSAGE },
 					{ role: 'user', content: idea }
