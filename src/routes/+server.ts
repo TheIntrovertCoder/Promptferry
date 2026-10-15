@@ -122,7 +122,7 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 	try {
 		prompt_response = await openrouter_client.chat.send({
 			chatRequest: {
-				model: 'apodex/apodex-1.1-mini:free',
+				model: 'openrouter/auto',
 				messages: [
 					{ role: 'system', content: SYSTEM_MESSAGE },
 					{ role: 'user', content: idea }
@@ -132,7 +132,12 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		})
 	} catch (err) {
 		console.error('[openrouter] send failed:', err)
-		const record = err as { status?: number; statusCode?: number; name?: string }
+		const record = err as {
+			status?: number
+			statusCode?: number
+			name?: string
+			message?: string
+		}
 		const rateLimited =
 			record?.status === 429 ||
 			record?.statusCode === 429 ||
@@ -145,21 +150,19 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 				{ 'Retry-After': '60' }
 			)
 		}
-		return plain(
-			'The prompt service could not be reached. This is a problem on our side — please try again shortly.',
-			502
-		)
-	}
 
-	if (!(prompt_response instanceof ReadableStream)) {
-		console.error('[openrouter] expected a stream, got:', typeof prompt_response)
+		console.error(`statusCode: ${record.statusCode}, \nmessage: ${record.message}`)
+
 		return plain(
 			'The prompt service returned an unexpected response. This is a problem on our side — please try again shortly.',
 			502
 		)
 	}
 
-	const iterator = prompt_response[Symbol.asyncIterator]()
+	type StreamResponse = Extract<typeof prompt_response, AsyncIterable<unknown>>
+
+	const stream = prompt_response as StreamResponse
+	const iterator = stream[Symbol.asyncIterator]()
 	let buffered = ''
 	let finished = false
 
