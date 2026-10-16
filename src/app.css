@@ -676,7 +676,7 @@ main {
 		.output-card {
 			animation: card-reveal 1ms linear both;
 			animation-timeline: view();
-			animation-range: entry 0% cover 25%;
+			animation-range: entry 0% cover 10%;
 		}
 	}
 }
