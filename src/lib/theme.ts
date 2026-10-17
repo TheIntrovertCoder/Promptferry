@@ -1,6 +1,6 @@
 import { browser } from '$app/env'
 
-export type Theme = 'light' | 'dark'
+type Theme = 'light' | 'dark'
 
 const STORAGE_KEY = 'promptferry-theme'
 

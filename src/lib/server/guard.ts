@@ -57,18 +57,51 @@ const NON_IDEA_PATTERNS: InjectionPattern[] = [
 	{
 		label: 'content-request',
 		pattern:
-			/^\s*(?:(?:please|pls|can\s+you|could\s+you)\s+)*(?:generate|draw|paint|imagine|write|compose|translate|summari[sz]e|explain|solve|calculate|tell|give|list|find|recommend|show)\b/i
+			/^\s*(?:(?:please|pls|can\s+you|could\s+you)\s+)*(?:generate|draw|paint|imagine|write|compose|translate|summari[sz]e|explain|solve|calculate|tell|give|list|find|recommend|show|create|make|build|design|develop)\b/i
 	},
 	{
 		label: 'question',
-		pattern: /^\s*(?:what|who|when|where|why|which|how|is|are|can|could|should|do|does|did)\b/i
+		pattern:
+			/^\s*(?:what|who|when|where|why|which|how|is|are|can|could|should|do|does|did|will|would|may|might)\b/i
+	},
+	{
+		label: 'creative-writing',
+		pattern:
+			/^\s*(?:write|compose|draft|pen|craft|author)\b.*\b(?:a\s+)?(?:story|poem|essay|article|blog|letter|email|speech|script|lyrics|novel|review|caption|bio|headline|slogan|tagline)\b/i
+	},
+	{
+		label: 'code-explanation',
+		pattern:
+			/^\s*(?:what\s+does|how\s+does|can\s+you\s+explain|explain\s+this|what\s+is\s+this)\b.*\b(code|function|script|program|snippet)\b/i
+	},
+	{
+		label: 'homework-assignment',
+		pattern:
+			/^\s*(?:can\s+you\s+)?(?:help\s+me\s+)?(?:with\s+)?(?:my\s+)?(?:homework|assignment|project|essay|paper|thesis|dissertation)\b/i
+	},
+	{
+		label: 'image-generation',
+		pattern:
+			/^\s*(?:generate|create|make|draw|paint|design)\b.*\b(?:image|picture|photo|logo|icon|illustration|graphic|banner|wallpaper)\b/i
+	},
+	{
+		label: 'translation',
+		pattern:
+			/^\s*(?:translate|translation)\b.*\b(?:to\s+|from\s+|english|spanish|french|german|chinese|japanese|korean|italian|portuguese|russian|arabic|hindi)\b/i
+	},
+	{
+		label: 'summarization',
+		pattern:
+			/^\s*(?:summarize|summary|summari[sz]e|tl;?dr|give\s+me\s+the\s+gist|in\s+brief)\b/i
 	}
 ]
 
 export function scanForNonIdea(input: string): string | null {
-	if (PROJECT_NOUNS.test(input)) return null
+	// Check content-request/question patterns FIRST so a request that asks
+	// for content is blocked even if it happens to mention a project noun.
 	for (const { label, pattern } of NON_IDEA_PATTERNS) {
 		if (pattern.test(input)) return label
 	}
+	if (PROJECT_NOUNS.test(input)) return null
 	return null
 }

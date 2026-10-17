@@ -42,6 +42,11 @@ export async function checkRateLimit(
 	return checkMemory(key, now)
 }
 
+// NOTE: Netlify Blobs does not expose a compare-and-swap / atomic append, so
+// checkBlobs is inherently check-then-act: between store.get and store.setJSON
+// a concurrent request can read the same timestamp list and both slip through.
+// The in-memory store below is safe because JS is single-threaded per isolate.
+// This is the best achievable with the Netlify Blobs API alone.
 async function checkBlobs(store: Store, key: string, now: number): Promise<RateLimitResult> {
 	const windowStart = now - WINDOW_MS
 	const stored = await store.get(key, { type: 'json' })

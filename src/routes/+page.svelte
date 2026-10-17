@@ -27,9 +27,37 @@
 	let copyTimer: ReturnType<typeof setTimeout> | undefined
 
 	let html = $derived.by(() => {
-		if (!browser || !raw) return ''
-		const parsed = marked.parse(raw, { async: false })
-		return DOMPurify.sanitize(typeof parsed === 'string' ? parsed : '')
+		if (!browser || !raw || loading) return ''
+		let parsed: string
+		try {
+			parsed = marked.parse(raw, { async: false })
+		} catch {
+			parsed = ''
+		}
+		return DOMPurify.sanitize(typeof parsed === 'string' ? parsed : '', {
+			FORBID_ATTR: [
+				'onerror',
+				'onload',
+				'onclick',
+				'onmouseover',
+				'onmouseout',
+				'onfocus',
+				'onkeydown',
+				'onkeyup',
+				'style'
+			],
+			FORBID_TAGS: [
+				'script',
+				'iframe',
+				'object',
+				'embed',
+				'form',
+				'input',
+				'textarea',
+				'select',
+				'button'
+			]
+		})
 	})
 
 	async function handleSubmit(event: SubmitEvent): Promise<void> {
@@ -94,6 +122,10 @@
 
 	async function copyPrompt(): Promise<void> {
 		try {
+			if (!navigator.clipboard) {
+				copied = false
+				return
+			}
 			await navigator.clipboard.writeText(raw)
 			copied = true
 			clearTimeout(copyTimer)
@@ -165,14 +197,14 @@
 			{/if}
 		</div>
 		<div class="output-body">
-			{#if raw}
-				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-				<div class="prose">{@html html}</div>
-			{:else}
+			{#if loading}
 				<p class="output-wait">
 					<span class="spinner" aria-hidden="true"></span>
 					Researching your idea…
 				</p>
+			{:else if raw}
+				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+				<div class="prose">{@html html}</div>
 			{/if}
 		</div>
 	</section>

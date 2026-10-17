@@ -1,6 +1,6 @@
 import type { RequestHandler } from './$types'
 import { IDEA_MAX_LENGTH, sanitizeIdea } from '#lib/idea.ts'
-import { openrouter_client } from '#lib/server/openrouter.ts'
+import { openrouter_client, validateApiKey } from '#lib/server/openrouter.ts'
 import { scanForInjection, scanForNonIdea } from '#lib/server/guard.ts'
 import { checkRateLimit } from '#lib/server/rate-limit.ts'
 
@@ -12,6 +12,8 @@ const NON_IDEA_HINT =
 
 const UPSTREAM_STALL_MS = 20_000
 const MAX_PREFETCH_CHUNKS = 2000
+const MAX_PREFETCH_CHARS = 500
+const TOTAL_GENERATION_MS = 120_000
 
 const normalizeSentinel = (text: string): string => text.replace(/[^A-Za-z_]/g, '').toUpperCase()
 
@@ -66,8 +68,22 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		})
 	}
 
+	// Validate the API key lazily at request time so a bad key returns a
+	// clear 502 instead of crashing the module at load time.
+	try {
+		validateApiKey()
+	} catch {
+		return plain(
+			'The prompt service is not configured correctly. This is a problem on our side — please try again shortly.',
+			502
+		)
+	}
+
+	// Early rejection when the client declares a body size over the limit.
+	// If content-length is missing we cannot preflight; the definitive check
+	// happens after reading the body below.
 	const contentLength = Number(request.headers.get('content-length') ?? 0)
-	if (contentLength > MAX_BODY_BYTES) {
+	if (contentLength > 0 && contentLength > MAX_BODY_BYTES) {
 		return plain(
 			`The request was too large (limit ${MAX_BODY_KB} KB). Please shorten your idea and try again.`,
 			413
@@ -97,6 +113,16 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		return plain(
 			'Your idea was empty after removing unsupported characters. Please type a project idea.',
 			400
+		)
+	}
+
+	// Definitive body-size check: catches requests that omit content-length,
+	// which would otherwise bypass the early preflight above.
+	const ideaBytes = new TextEncoder().encode(raw).length
+	if (ideaBytes > MAX_BODY_BYTES) {
+		return plain(
+			`The request was too large (limit ${MAX_BODY_KB} KB). Please shorten your idea and try again.`,
+			413
 		)
 	}
 	if (idea.length > IDEA_MAX_LENGTH) {
@@ -162,34 +188,61 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 	type StreamResponse = Extract<typeof prompt_response, AsyncIterable<unknown>>
 
 	const stream = prompt_response as StreamResponse
-	const iterator = stream[Symbol.asyncIterator]()
+	let iterator: AsyncIterator<StreamChunk>
+	try {
+		iterator = stream[Symbol.asyncIterator]()
+	} catch (err) {
+		console.error('[openrouter] response is not iterable:', err)
+		return plain(
+			'The prompt service returned an unexpected response. This is a problem on our side — please try again shortly.',
+			502
+		)
+	}
 	let buffered = ''
 	let finished = false
+	let truncated = false
 
-	for (let prefetched = 0; prefetched < MAX_PREFETCH_CHUNKS; prefetched++) {
-		let chunk: IteratorResult<StreamChunk>
-		try {
-			chunk = await readChunk(iterator, UPSTREAM_STALL_MS)
-		} catch (err) {
-			console.error('[openrouter] upstream stalled before first output:', err)
-			return plain(
-				'The prompt service is not responding. This is a problem on our side — please try again shortly.',
-				504
-			)
+	// Overall generation deadline: abort if the provider takes too long.
+	const deadlineController = new AbortController()
+	const deadlineTimer = setTimeout(() => {
+		deadlineController.abort()
+	}, TOTAL_GENERATION_MS)
+
+	try {
+		for (let prefetched = 0; prefetched < MAX_PREFETCH_CHUNKS; prefetched++) {
+			if (deadlineController.signal.aborted) {
+				truncated = true
+				break
+			}
+			let chunk: IteratorResult<StreamChunk>
+			try {
+				chunk = await readChunk(iterator, UPSTREAM_STALL_MS)
+			} catch (err) {
+				await iterator.return?.()
+				console.error('[openrouter] upstream stalled before first output:', err)
+				return plain(
+					'The prompt service is not responding. This is a problem on our side — please try again shortly.',
+					504
+				)
+			}
+			if (chunk.done) {
+				finished = true
+				break
+			}
+			const text = chunk.value.choices[0]?.delta?.content ?? ''
+			if (!text) continue
+			buffered += text
+			const normalized = normalizeSentinel(buffered)
+			if (buffered.length >= MAX_PREFETCH_CHARS) break
+			if (normalized.length >= NON_IDEA_SENTINEL.length) break
+			if (!NON_IDEA_SENTINEL.startsWith(normalized)) break
 		}
-		if (chunk.done) {
-			finished = true
-			break
-		}
-		const text = chunk.value.choices[0]?.delta?.content ?? ''
-		if (!text) continue
-		buffered += text
-		const normalized = normalizeSentinel(buffered)
-		if (normalized.length >= NON_IDEA_SENTINEL.length) break
-		if (!NON_IDEA_SENTINEL.startsWith(normalized)) break
+	} finally {
+		clearTimeout(deadlineTimer)
 	}
 
 	if (normalizeSentinel(buffered).startsWith(NON_IDEA_SENTINEL)) {
+		await iterator.return?.()
 		console.warn('[guard] non-idea sentinel returned by model')
 		return plain(NON_IDEA_HINT, 422)
 	}
@@ -202,21 +255,41 @@ export const POST: RequestHandler = async ({ request, getClientAddress }) => {
 		)
 	}
 
+	if (truncated) {
+		console.warn('[openrouter] generation exceeded deadline, truncating')
+	}
+
 	return new Response(
 		new ReadableStream({
 			async start(controller) {
 				try {
 					controller.enqueue(buffered)
 					while (true) {
-						const { value, done } = await iterator.next()
+						if (deadlineController.signal.aborted) {
+							truncated = true
+							break
+						}
+						const { value, done } = await readChunk(iterator, UPSTREAM_STALL_MS)
 						if (done) break
 						controller.enqueue(value.choices[0]?.delta?.content ?? '')
+					}
+					if (truncated) {
+						controller.enqueue(
+							'\n\n_[Response was truncated due to a generation timeout.]_'
+						)
 					}
 					controller.close()
 				} catch (err) {
 					console.error('[openrouter] stream failed mid-generation:', err)
-					controller.error(err)
+					if (!deadlineController.signal.aborted) {
+						controller.error(err)
+					} else {
+						controller.close()
+					}
 				}
+			},
+			cancel() {
+				void iterator.return?.()
 			}
 		}),
 		{ headers: { 'Content-Type': 'text/event-stream' } }
