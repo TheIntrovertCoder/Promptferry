@@ -44,8 +44,12 @@ const PATTERNS: InjectionPattern[] = [
 ]
 
 export function scanForInjection(input: string): string | null {
+	// Normalize compatibility characters so obfuscated injection attempts
+	// (e.g. homoglyphs such as ɡ for g) still match the deny-list patterns.
+	// This is best-effort defense-in-depth; the system message is the backstop.
+	const normalized = input.normalize('NFKC')
 	for (const { label, pattern } of PATTERNS) {
-		if (pattern.test(input)) return label
+		if (pattern.test(normalized)) return label
 	}
 	return null
 }
@@ -104,7 +108,7 @@ export function scanForNonIdea(input: string): string | null {
 	// backstop for anything that still slips through.
 	for (const { label, pattern } of NON_IDEA_PATTERNS) {
 		if (!pattern.test(input)) continue
-		if (label === 'content-request' && PROJECT_NOUNS.test(input)) {
+		if ((label === 'content-request' || label === 'question') && PROJECT_NOUNS.test(input)) {
 			return null
 		}
 		return label
