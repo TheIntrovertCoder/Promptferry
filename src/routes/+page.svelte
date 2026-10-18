@@ -14,6 +14,10 @@
 	const NON_IDEA_FALLBACK =
 		'That looks like a request for content rather than a project to build. Describe the app, site, or tool you want to make.'
 
+	// Cap the accumulated streamed response so a very long model output
+	// cannot grow client memory without bound.
+	const MAX_RESPONSE_CHARS = 100_000
+
 	function errorFallback(status: number): string {
 		if (status === 429)
 			return 'You are sending requests too quickly. Wait a moment and try again.'
@@ -44,7 +48,9 @@
 				'onfocus',
 				'onkeydown',
 				'onkeyup',
-				'style'
+				'style',
+				'href',
+				'src'
 			],
 			FORBID_TAGS: [
 				'script',
@@ -109,9 +115,16 @@
 				while (true) {
 					const { done, value } = await reader.read()
 					if (done) break
+					if (raw.length >= MAX_RESPONSE_CHARS) continue // cap reached: drain without storing
 					raw += decoder.decode(value, { stream: true })
+					if (raw.length > MAX_RESPONSE_CHARS) {
+						raw = raw.slice(0, MAX_RESPONSE_CHARS)
+					}
 				}
 				raw += decoder.decode()
+				if (raw.length > MAX_RESPONSE_CHARS) {
+					raw = raw.slice(0, MAX_RESPONSE_CHARS)
+				}
 			} catch {
 				error = 'The connection dropped while generating your prompt. Please try again.'
 			}

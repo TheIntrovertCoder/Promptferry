@@ -7,7 +7,7 @@ const PATTERNS: InjectionPattern[] = [
 	{
 		label: 'instruction-override',
 		pattern:
-			/\bignore\s+(?:all\s+|any\s+|previous|prior|above|earlier|preceding)\s+(?:instructions?|rules?|prompts?|guidelines?|directions?)\b/i
+			/\bignore\s+(?:all|any|previous|prior|above|earlier|preceding)(?:\s+(?:previous|prior|above|earlier|preceding))?\s+(?:instructions?|rules?|prompts?|guidelines?|directions?)\b/i
 	},
 	{
 		label: 'instruction-override',
@@ -97,11 +97,17 @@ const NON_IDEA_PATTERNS: InjectionPattern[] = [
 ]
 
 export function scanForNonIdea(input: string): string | null {
-	// Check content-request/question patterns FIRST so a request that asks
-	// for content is blocked even if it happens to mention a project noun.
+	// Check content-request/question patterns first. content-request verbs
+	// (build, make, create, ...) also describe project ideas, so an input
+	// that names a concrete project noun is treated as a project idea and
+	// allowed through; the model's NOT_A_PROJECT_IDEA sentinel is the
+	// backstop for anything that still slips through.
 	for (const { label, pattern } of NON_IDEA_PATTERNS) {
-		if (pattern.test(input)) return label
+		if (!pattern.test(input)) continue
+		if (label === 'content-request' && PROJECT_NOUNS.test(input)) {
+			return null
+		}
+		return label
 	}
-	if (PROJECT_NOUNS.test(input)) return null
 	return null
 }
