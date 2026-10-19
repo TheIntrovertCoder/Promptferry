@@ -10,6 +10,13 @@
 	let error = $state('')
 	let hint = $state('')
 	let copied = $state(false)
+	let stage = $state('')
+	let streamComplete = $state(false)
+	let truncated = $state(false)
+
+	// Sent by the server when generation hits its deadline — strip it from
+	// copied output and surface a warning to the user.
+	const TRUNCATION_MARKER = '\n\n_[Response was truncated due to a generation timeout.]_'
 
 	const NON_IDEA_FALLBACK =
 		'That looks like a request for content rather than a project to build. Describe the app, site, or tool you want to make.'
@@ -81,6 +88,9 @@
 		loading = true
 		copied = false
 		raw = ''
+		stage = 'sending'
+		streamComplete = false
+		truncated = false
 
 		try {
 			const formData = new FormData()
@@ -114,9 +124,13 @@
 			try {
 				while (true) {
 					const { done, value } = await reader.read()
-					if (done) break
+					if (done) {
+						streamComplete = true
+						break
+					}
 					if (raw.length >= MAX_RESPONSE_CHARS) continue // cap reached: drain without storing
 					raw += decoder.decode(value, { stream: true })
+					if (stage === 'sending') stage = 'generating'
 					if (raw.length > MAX_RESPONSE_CHARS) {
 						raw = raw.slice(0, MAX_RESPONSE_CHARS)
 					}
@@ -125,11 +139,16 @@
 				if (raw.length > MAX_RESPONSE_CHARS) {
 					raw = raw.slice(0, MAX_RESPONSE_CHARS)
 				}
+				truncated = raw.endsWith(TRUNCATION_MARKER)
 			} catch {
 				error = 'The connection dropped while generating your prompt. Please try again.'
 			}
 		} finally {
 			loading = false
+			stage = ''
+			if (streamComplete && !raw.trim() && !error) {
+				error = 'The prompt came back empty. Please try again.'
+			}
 		}
 	}
 
@@ -139,7 +158,7 @@
 				copied = false
 				return
 			}
-			await navigator.clipboard.writeText(raw)
+			await navigator.clipboard.writeText(raw.replace(TRUNCATION_MARKER, ''))
 			copied = true
 			clearTimeout(copyTimer)
 			copyTimer = setTimeout(() => {
@@ -211,13 +230,25 @@
 		</div>
 		<div class="output-body">
 			{#if loading}
-				<p class="output-wait">
+				<p class="output-wait" role="status">
 					<span class="spinner" aria-hidden="true"></span>
-					Researching your idea…
+					{#if stage === 'sending'}
+						Sending your idea…
+					{:else if stage === 'generating'}
+						Generating your prompt…
+					{:else}
+						Putting it together…
+					{/if}
 				</p>
 			{:else if raw}
 				<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 				<div class="prose">{@html html}</div>
+				{#if truncated}
+					<p class="output-wait" role="status">
+						The response was cut off before finishing. Copy what's generated and try
+						again with a shorter idea.
+					</p>
+				{/if}
 			{/if}
 		</div>
 	</section>
