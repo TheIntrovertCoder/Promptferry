@@ -12,7 +12,7 @@
       },
       "devDependencies": {
         "@eslint/js": "^10.0.1",
-        "@sveltejs/adapter-netlify": "^7.0.0",
+        "@sveltejs/adapter-static": "^4.0.0",
         "@sveltejs/enhanced-img": "^1.0.0",
         "@sveltejs/kit": "^3.0.0",
         "@sveltejs/vite-plugin-svelte": "^7.2.0",
@@ -144,8 +144,6 @@
 
     "@netlify/runtime-utils": ["@netlify/runtime-utils@3.0.0", "", {}, "sha512-OHo40+V3QZkR+UrDjqhN+LekrAby/dSSJxsvyYs9i88E/mSl3goB/ysoL+VYROm190egxmQyRYlHK7vL4GeHBQ=="],
 
-    "@netlify/types": ["@netlify/types@3.2.0", "", {}, "sha512-PVvY1EEN9i2Er0LQoiyNG7i/BnwnttLuZqIkBnhL2Jrcj3P5N/NcGkv1i20MJ2ngNGSPQcT7tagDmF3V6BsdWg=="],
-
     "@openrouter/sdk": ["@openrouter/sdk@1.4.25", "", { "dependencies": { "zod": "^3.25.0 || ^4.0.0" } }, "sha512-H218lYMy9WhU5cMigUvW/k+e1BimCqTTP+9PqssdDXnQ0gFCeEME0HTsFGPbR6UgJgyYh2hTct43/9pMcBem5A=="],
 
     "@opentelemetry/api": ["@opentelemetry/api@1.9.1", "", {}, "sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q=="],
@@ -210,7 +208,7 @@
 
     "@sveltejs/acorn-typescript": ["@sveltejs/acorn-typescript@1.0.13", "", { "peerDependencies": { "acorn": "^8.9.0" } }, "sha512-wgKggnhZVL9Bfx1OaKKTrYY9BFRk6C8UAkQNUcIv1+llzYrIqy+RZm5HPKzn0NpEBvTVhTqB4kQyllZywsRBRQ=="],
 
-    "@sveltejs/adapter-netlify": ["@sveltejs/adapter-netlify@7.0.1", "", { "dependencies": { "@netlify/types": "^3.0.0", "rolldown": "^1.2.3" }, "peerDependencies": { "@sveltejs/kit": "^3.0.0-next.0" } }, "sha512-TJDKown4i+KiK7E1sSRiPAoHnpMlwSXAwehUVNPiwK69dwbnCQ6hKurYQwP+e3d+82X1v/Cs47BGH6Vg0dNZ6A=="],
+    "@sveltejs/adapter-static": ["@sveltejs/adapter-static@4.0.0", "", { "peerDependencies": { "@sveltejs/kit": "^3.0.0-next.0" } }, "sha512-aF1J23R1ebKqUxQ4/qLr/Lxu63NFmLAtg8UZl3HFLxaoA1D/nhTVGcD9lTqx65iUbjNR2iOL0TgOxSX82x6Paw=="],
 
     "@sveltejs/enhanced-img": ["@sveltejs/enhanced-img@1.0.0", "", { "dependencies": { "magic-string": "^1.2.3", "sharp": "^0.35.3", "vite-imagetools": "^12.0.0", "zimmerframe": "^1.1.4" }, "peerDependencies": { "@sveltejs/vite-plugin-svelte": "^7.0.0", "svelte": "^5.0.0", "vite": ">=8.0.12" } }, "sha512-MVY2SNj1NE/DW7yrAePFfOeEnj/PfkHPQvWfeL23h/a0i7r1qEF5qj3iIyxqCF5Vu+akskQ/h5eEEM7hjvFmrQ=="],
 
